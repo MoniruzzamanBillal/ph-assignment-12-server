@@ -11,7 +11,6 @@
   "name": "server",
   "version": "1.0.0",
   "main": "app.js",
-  "devDependencies": {},
   "scripts": {
     "start": "nodse src/app.js",
     "dev": "nodemon src/app.js",
