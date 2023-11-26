@@ -41,31 +41,54 @@ async function run() {
     const usersCollection = database.collection("users");
 
     // ! creating collection ends
+    //*-------------------------------------------------------------------------------
+
+    // ! creating token
+
+    app.post("/jwt", async (req, res) => {
+      try {
+        const data = req.body;
+
+        const token = jwt.sign(data, process.env.Access_Token_SECRET, {
+          expiresIn: "2h",
+        });
+
+        res
+          .cookie("token", token, {
+            httpOnly: true,
+            secure: false,
+          })
+          .send({ token });
+      } catch (error) {
+        console.log(error);
+      }
+    });
+
+    // ! creating token  ends
+    //*-------------------------------------------------------------------------------
 
     //*-------------------------------------------------------------------------------
 
     //! user related api
 
+    // get user from database
+    app.get("/users", async (req, res) => {
+      const data = await usersCollection.find().toArray();
+
+      res.send(data);
+    });
+
+    // create user in database
     app.post("/user", async (req, res) => {
       try {
         const userData = req.body;
-
-        // console.log("data in user api = ", userData);
-
-        // email
         const query = {
           email: userData.email,
         };
-
         const isExist = await usersCollection.findOne(query);
-
-        console.log("query result = ", isExist);
-
         if (isExist) {
           return res.send({ message: "user already exist " });
         }
-
-        console.log("hit after check ");
         const response = await usersCollection.insertOne(userData);
 
         res.send(response);
@@ -116,9 +139,7 @@ async function run() {
     app.post("/parcel", async (req, res) => {
       try {
         const requestedData = req.body;
-
         const response = await parcelsCollection.insertOne(requestedData);
-
         res.send(response);
       } catch (error) {
         res.send({ errorMessage: error });
