@@ -9,13 +9,11 @@ const app = express();
 
 const ParcelRoute = require("./Routes/ParcelRoute");
 
-// mdmoniruzzamanbillal
-// 8zm47LfYljftUhpM
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@shipease.zrucvqo.mongodb.net/?retryWrites=true&w=majority`;
 
 app.use(
   cors({
-    origin: ["http://localhost:5173", "https://shipease-1604d.web.app/"],
+    origin: ["http://localhost:5173"],
     credentials: true,
   })
 );
@@ -41,7 +39,46 @@ async function run() {
     const database = client.db("shipease");
     const parcelsCollection = database.collection("parcels");
     const usersCollection = database.collection("users");
+
     // ! creating collection ends
+
+    //*-------------------------------------------------------------------------------
+
+    //! user related api
+
+    app.post("/user", async (req, res) => {
+      try {
+        const userData = req.body;
+
+        // console.log("data in user api = ", userData);
+
+        // email
+        const query = {
+          email: userData.email,
+        };
+
+        const isExist = await usersCollection.findOne(query);
+
+        console.log("query result = ", isExist);
+
+        if (isExist) {
+          return res.send({ message: "user already exist " });
+        }
+
+        console.log("hit after check ");
+        const response = await usersCollection.insertOne(userData);
+
+        res.send(response);
+      } catch (error) {
+        console.log(error);
+      }
+    });
+
+    //! user related api ends
+
+    //*-------------------------------------------------------------------------------
+
+    //!-------------------------------------------------------------------------------
 
     // ! parcels realted api
 
@@ -115,6 +152,7 @@ async function run() {
     });
 
     // ! parcels realted api ends
+    //!-------------------------------------------------------------------------------
 
     await client.db("admin").command({ ping: 1 });
     console.log(
