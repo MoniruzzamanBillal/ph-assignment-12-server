@@ -49,21 +49,30 @@ async function run() {
     app.get("/parcels", async (req, res) => {
       try {
         let query = {};
-
         if (req?.query?.uid) {
           query = {
             uid: req.query.uid,
           };
         }
-
-        console.log(query);
-
         const parcelResponse = await parcelsCollection.find(query).toArray();
-        console.log(parcelResponse);
         res.send(parcelResponse);
       } catch (error) {
         console.log(error);
       }
+    });
+
+    // get particular parcel data
+    app.get("/parcel/:id", async (req, res) => {
+      console.log("hit in specific data");
+      const id = req.params.id;
+
+      const query = {
+        _id: new ObjectId(id),
+      };
+
+      const responseData = await parcelsCollection.findOne(query);
+
+      res.send(responseData);
     });
 
     // * add parcel to database
@@ -79,6 +88,31 @@ async function run() {
       }
     });
     // * add parcel to database ends
+
+    app.patch("/parcel/:id", async (req, res) => {
+      const id = req.params.id;
+
+      const data = req.body;
+
+      // console.log("hit in update route = ", data);
+      const query = { _id: new ObjectId(id) };
+
+      const option = { upsert: true };
+
+      const update = {
+        $set: {
+          ...data,
+        },
+      };
+
+      const updateResponse = await parcelsCollection.updateOne(
+        query,
+        update,
+        option
+      );
+
+      res.send(updateResponse);
+    });
 
     // ! parcels realted api ends
 
