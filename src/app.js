@@ -45,6 +45,27 @@ async function run() {
 
     // ! parcels realted api
 
+    // get all parcel data
+    app.get("/parcels", async (req, res) => {
+      try {
+        let query = {};
+
+        if (req?.query?.uid) {
+          query = {
+            uid: req.query.uid,
+          };
+        }
+
+        console.log(query);
+
+        const parcelResponse = await parcelsCollection.find(query).toArray();
+        console.log(parcelResponse);
+        res.send(parcelResponse);
+      } catch (error) {
+        console.log(error);
+      }
+    });
+
     // * add parcel to database
     app.post("/parcel", async (req, res) => {
       try {
