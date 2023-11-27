@@ -43,6 +43,29 @@ async function run() {
     // ! creating collection ends
     //*-------------------------------------------------------------------------------
 
+    //*-------------------------------------------------------------------------------
+
+    // ! making  middlewire
+    const verifyToken = (req, res, next) => {
+      // console.log(req.headers.cookie);
+      const token = req?.headers?.cookie;
+      if (!token) {
+        return res.status(401).send({ message: "forbidden access" });
+      }
+
+      jwt.verify(token, process.env.Access_Token_SECRET, (error, decoded) => {
+        if (error) {
+          return res.status(401).status({ message: "forbidden access" });
+        }
+
+        req.decoded = decoded;
+
+        next();
+      });
+    };
+    // ! making  middlewire ends
+    //*-------------------------------------------------------------------------------
+
     // ! creating token
 
     app.post("/jwt", async (req, res) => {
@@ -109,11 +132,15 @@ async function run() {
     app.get("/parcels", async (req, res) => {
       try {
         let query = {};
-        if (req?.query?.uid) {
+        if (req?.query?.email) {
           query = {
-            uid: req.query.uid,
+            userEmail: req.query.email,
           };
         }
+
+        // userEmail
+        console.log("query in server = ", query);
+        // console.log("email in server = ", req?.query);
         const parcelResponse = await parcelsCollection.find(query).toArray();
         res.send(parcelResponse);
       } catch (error) {
