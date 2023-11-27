@@ -39,6 +39,7 @@ async function run() {
     const database = client.db("shipease");
     const parcelsCollection = database.collection("parcels");
     const usersCollection = database.collection("users");
+    const reviewsCollection = database.collection("reviews");
 
     // ! creating collection ends
     //*-------------------------------------------------------------------------------
@@ -309,6 +310,25 @@ async function run() {
       );
 
       res.send(updateResponse);
+    });
+
+    // delete particular data from parcel
+    app.delete("/parcel/delete/:id", async (req, res) => {
+      try {
+        const id = req.params.id;
+
+        // console.log("id in delete parcel = ", id);
+
+        const query = {
+          _id: new ObjectId(id),
+        };
+
+        const response = await parcelsCollection.deleteOne(query);
+
+        res.send(response);
+      } catch (error) {
+        console.log(error);
+      }
     });
 
     // get delivery man assign data
