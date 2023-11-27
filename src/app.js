@@ -189,6 +189,36 @@ async function run() {
       res.send(data);
     });
 
+    // get user related data
+    app.get("/userOnly", async (req, res) => {
+      const query = {
+        role: "user",
+      };
+
+      const data = await usersCollection.find(query).toArray();
+
+      res.send(data);
+    });
+
+    // make delivery man api
+    app.patch("/delivaryman/user/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = {
+        _id: new ObjectId(id),
+      };
+
+      // console.log("query in admin make = ", query);
+      const updateDoc = {
+        $set: {
+          role: "deliveryman",
+        },
+      };
+
+      const result = await usersCollection.updateOne(query, updateDoc);
+
+      res.send(result);
+    });
+
     //! user related api ends
 
     //*-------------------------------------------------------------------------------
