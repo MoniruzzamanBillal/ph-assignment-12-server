@@ -207,10 +207,27 @@ async function run() {
         _id: new ObjectId(id),
       };
 
-      // console.log("query in admin make = ", query);
       const updateDoc = {
         $set: {
           role: "deliveryman",
+        },
+      };
+
+      const result = await usersCollection.updateOne(query, updateDoc);
+
+      res.send(result);
+    });
+
+    // make admin api
+    app.patch("/admin/user/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = {
+        _id: new ObjectId(id),
+      };
+
+      const updateDoc = {
+        $set: {
+          role: "admin",
         },
       };
 
