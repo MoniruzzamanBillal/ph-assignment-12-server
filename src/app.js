@@ -246,6 +246,7 @@ async function run() {
     });
     // * add parcel to database ends
 
+    // update parcel info in database
     app.patch("/parcel/:id", async (req, res) => {
       const id = req.params.id;
 
