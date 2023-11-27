@@ -13,7 +13,7 @@ const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@shipeas
 
 app.use(
   cors({
-    origin: ["http://localhost:5173"],
+    origin: ["http://localhost:5173", "https://shipease-1604d.web.app"],
     credentials: true,
   })
 );
@@ -156,7 +156,8 @@ async function run() {
         email: requestedEmail,
       };
       const user = await usersCollection.findOne(query);
-      res.send({ role: user.role });
+      // console.log(user);
+      res.send({ role: user.role, id: user._id });
     });
 
     // create user in database
@@ -246,9 +247,6 @@ async function run() {
 
     // get all parcel data
     app.get("/parcels", verifyToken, async (req, res) => {
-      // app.get("/parcels", async (req, res) => {
-      // console.log("verified user = ", req.decoded);
-      // console.log("data in header = ", req.headers);
       try {
         let query = {};
         if (req?.query?.email) {
@@ -257,9 +255,6 @@ async function run() {
           };
         }
 
-        // userEmail
-        // console.log("query in server = ", query);
-        // console.log("email in server = ", req?.query);
         const parcelResponse = await parcelsCollection.find(query).toArray();
         res.send(parcelResponse);
       } catch (error) {
@@ -271,13 +266,10 @@ async function run() {
     app.get("/parcel/:id", async (req, res) => {
       console.log("hit in specific data");
       const id = req.params.id;
-
       const query = {
         _id: new ObjectId(id),
       };
-
       const responseData = await parcelsCollection.findOne(query);
-
       res.send(responseData);
     });
 
@@ -317,6 +309,27 @@ async function run() {
       );
 
       res.send(updateResponse);
+    });
+
+    // get delivery man assign data
+    app.get("/mydelivery/:id", async (req, res) => {
+      try {
+        const delivartManId = req.params.id;
+
+        // console.log("id on my delivery = ", delivartManId);
+
+        const query = {
+          delivartManId: delivartManId,
+        };
+
+        const response = await parcelsCollection.find(query).toArray();
+
+        // console.log("data in delivary = ", response);
+
+        res.send(response);
+      } catch (error) {
+        console.log(error);
+      }
     });
 
     // ! parcels realted api ends
