@@ -355,6 +355,28 @@ async function run() {
     // ! parcels realted api ends
     //!-------------------------------------------------------------------------------
 
+    //!-------------------------------------------------------------------------------
+
+    //! review related api starts
+
+    // add data in review collection
+    app.post("/review", async (req, res) => {
+      try {
+        const data = req.body;
+
+        // console.log("data in body = ", data);
+
+        const response = await reviewsCollection.insertOne(data);
+        // console.log(response);
+        res.send(response);
+      } catch (error) {
+        console.log(error);
+      }
+    });
+    //! review related api ends
+
+    //!-------------------------------------------------------------------------------
+
     await client.db("admin").command({ ping: 1 });
     console.log(
       "Pinged your deployment. You successfully connected to MongoDB!"
