@@ -146,23 +146,16 @@ async function run() {
       res.send(data);
     });
 
-    // user role related api
+    // * user role related api
     app.get("/user/role/:email", verifyToken, async (req, res) => {
       const requestedEmail = req.params.email;
-
-      // console.log(requestedEmail);
-
       if (requestedEmail !== req.decoded.email) {
         return res.status(403).send({ message: "unauthorized access " });
       }
-
       const query = {
         email: requestedEmail,
       };
-
       const user = await usersCollection.findOne(query);
-
-      console.log("user in role api = ", user.role);
       res.send({ role: user.role });
     });
 
@@ -183,6 +176,17 @@ async function run() {
       } catch (error) {
         console.log(error);
       }
+    });
+
+    // get delivery man related data api
+    app.get("/delivarymens", async (req, res) => {
+      const query = {
+        role: "deliveryman",
+      };
+
+      const data = await usersCollection.find(query).toArray();
+
+      res.send(data);
     });
 
     //! user related api ends
