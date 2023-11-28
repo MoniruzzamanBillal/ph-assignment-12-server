@@ -202,6 +202,59 @@ async function run() {
       res.send(data);
     });
 
+    // get user with pagination
+    app.get("/admin/userOnly", async (req, res) => {
+      const { page, pagePerItem } = req.query;
+      const pageNum = parseInt(page);
+      const perPageNum = parseInt(pagePerItem);
+      const skip = (pageNum - 1) * perPageNum;
+
+      const query = {
+        role: "user",
+      };
+
+      const userResponse = await usersCollection
+        .find(query)
+        .skip(skip)
+        .limit(perPageNum)
+        .toArray();
+
+      res.send(userResponse);
+    });
+
+    // get delivary man with pagination
+    app.get("/admin/delivarymans", async (req, res) => {
+      const { page, pagePerItem } = req.query;
+      const pageNum = parseInt(page);
+      const perPageNum = parseInt(pagePerItem);
+      const skip = (pageNum - 1) * perPageNum;
+
+      const query = {
+        role: "deliveryman",
+      };
+
+      const data = await usersCollection
+        .find(query)
+        .skip(skip)
+        .limit(perPageNum)
+        .toArray();
+
+      res.send(data);
+    });
+
+    // delivary man count
+    app.get("/delivaryman/count", async (req, res) => {
+      const query = {
+        role: "deliveryman",
+      };
+
+      const data = await usersCollection.find(query).toArray();
+
+      res.send({ count: data.length });
+
+      // const count = await usersCollection.estimatedDocumentCount();
+    });
+
     // make delivery man api
     app.patch("/delivaryman/user/:id", async (req, res) => {
       const id = req.params.id;
@@ -285,6 +338,39 @@ async function run() {
     app.get("/parcel/count", async (req, res) => {
       const count = await parcelsCollection.estimatedDocumentCount();
       res.send({ count: count });
+    });
+
+    // get user count $
+    app.get("/user/count", async (req, res) => {
+      const query = {
+        role: "user",
+      };
+
+      const data = await usersCollection.find(query).toArray();
+
+      res.send({ count: data.length });
+
+      // const count = await usersCollection.estimatedDocumentCount();
+    });
+
+    // admin will get all parcel data
+    app.get("/admin/parcels", verifyToken, async (req, res) => {
+      try {
+        const { page, pagePerItem } = req.query;
+        const pageNum = parseInt(page);
+        const perPageNum = parseInt(pagePerItem);
+        const skip = (pageNum - 1) * perPageNum;
+
+        const parcelResponse = await parcelsCollection
+          .find()
+          .skip(skip)
+          .limit(perPageNum)
+          .toArray();
+
+        res.send(parcelResponse);
+      } catch (error) {
+        console.log(error);
+      }
     });
 
     // get all parcel data
