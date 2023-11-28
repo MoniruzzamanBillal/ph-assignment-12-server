@@ -281,17 +281,37 @@ async function run() {
 
     // ! parcels realted api
 
+    // grt parcel count
+    app.get("/parcel/count", async (req, res) => {
+      const count = await parcelsCollection.estimatedDocumentCount();
+      res.send({ count: count });
+    });
+
     // get all parcel data
     app.get("/parcels", verifyToken, async (req, res) => {
       try {
+        const { page, pagePerItem, status } = req.query;
+        const pageNum = parseInt(page);
+        const perPageNum = parseInt(pagePerItem);
+        const skip = (pageNum - 1) * perPageNum;
+
         let query = {};
-        if (req?.query?.email) {
+        if (req?.query?.email && status !== "null") {
+          query = {
+            userEmail: req.query.email,
+            status: status,
+          };
+        } else {
           query = {
             userEmail: req.query.email,
           };
         }
-
-        const parcelResponse = await parcelsCollection.find(query).toArray();
+        console.log("query in server = ", query);
+        const parcelResponse = await parcelsCollection
+          .find(query)
+          .skip(skip)
+          .limit(perPageNum)
+          .toArray();
         res.send(parcelResponse);
       } catch (error) {
         console.log(error);
