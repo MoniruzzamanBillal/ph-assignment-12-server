@@ -326,6 +326,21 @@ async function run() {
       res.send(response);
     });
 
+    // get delivary man related api based on review and delivary done
+    app.get("/user/delivaryman", async (req, res) => {
+      const query = {
+        role: "deliveryman",
+      };
+
+      console.log("hit");
+
+      const data = await usersCollection.find(query).toArray();
+
+      console.log(data);
+
+      res.send(data);
+    });
+
     //! user related api ends
 
     //*-------------------------------------------------------------------------------
@@ -333,6 +348,17 @@ async function run() {
     //!-------------------------------------------------------------------------------
 
     // ! parcels realted api
+
+    // delivered count
+    app.get("/delivered/count", async (req, res) => {
+      const query = {
+        status: "delivered",
+      };
+
+      const data = await parcelsCollection.find(query).toArray();
+
+      res.send({ count: data.length });
+    });
 
     // grt parcel count
     app.get("/parcel/count", async (req, res) => {
