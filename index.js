@@ -7,9 +7,9 @@ const { MongoClient, ServerApiVersion, ObjectId, upsert } = require("mongodb");
 const port = process.env.port || 5000;
 const app = express();
 
-const ParcelRoute = require("./Routes/ParcelRoute");
-
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@shipease.zrucvqo.mongodb.net/?retryWrites=true&w=majority`;
+
+// https://shop-ease-beta.vercel.app
 
 app.use(
   cors({
@@ -31,10 +31,6 @@ const client = new MongoClient(uri, {
 });
 async function run() {
   try {
-    // Connect the client to the server	(optional starting in v4.7)
-    // await client.connect();
-    // Send a ping to confirm a successful connection
-
     // ! creating collection
     const database = client.db("shipease");
     const parcelsCollection = database.collection("parcels");
@@ -181,7 +177,7 @@ async function run() {
     });
 
     // get delivery man related data api
-    app.get("/delivarymens", verifyToken, async (req, res) => {
+    app.get("/delivarymens", async (req, res) => {
       const query = {
         role: "deliveryman",
       };
@@ -192,7 +188,7 @@ async function run() {
     });
 
     // get user related data
-    app.get("/userOnly", verifyToken, async (req, res) => {
+    app.get("/userOnly", async (req, res) => {
       const query = {
         role: "user",
       };
@@ -635,7 +631,7 @@ async function run() {
 run().catch(console.dir);
 // ! mongo db connection
 
-app.get("/health", (req, res) => {
+app.get("/", (req, res) => {
   res.send("server is running ");
 });
 
