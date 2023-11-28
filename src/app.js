@@ -238,6 +238,46 @@ async function run() {
       res.send(result);
     });
 
+    // parcel delivered related data add api
+    app.patch("/delivared/:id", async (req, res) => {
+      const delivaryManId = req.params.id;
+
+      const query = { _id: new ObjectId(delivaryManId) };
+      const option = { upsert: true };
+      let update = {};
+
+      const userdata = await usersCollection.findOne(query);
+
+      if (userdata && userdata.delivaryDone !== undefined) {
+        update = {
+          $inc: {
+            delivaryDone: 1,
+          },
+        };
+      } else {
+        update = {
+          $set: {
+            delivaryDone: 1,
+          },
+        };
+      }
+
+      // const update = {
+      //   $inc: { delivaryDone: 1 },
+      //   $setOnInsert: { delivaryDone: 1 },
+      // };
+
+      const response = await usersCollection.findOneAndUpdate(
+        query,
+        update,
+        option
+      );
+
+      console.log("response from  increase delivary = ", response);
+
+      res.send(response);
+    });
+
     //! user related api ends
 
     //*-------------------------------------------------------------------------------
@@ -287,6 +327,7 @@ async function run() {
     // * add parcel to database ends
 
     // update parcel info in database
+
     app.patch("/parcel/:id", async (req, res) => {
       const id = req.params.id;
 
@@ -294,9 +335,7 @@ async function run() {
 
       // console.log("hit in update route = ", data);
       const query = { _id: new ObjectId(id) };
-
       const option = { upsert: true };
-
       const update = {
         $set: {
           ...data,
@@ -363,16 +402,27 @@ async function run() {
     app.post("/review", async (req, res) => {
       try {
         const data = req.body;
-
-        // console.log("data in body = ", data);
-
         const response = await reviewsCollection.insertOne(data);
-        // console.log(response);
         res.send(response);
       } catch (error) {
         console.log(error);
       }
     });
+
+    // get specific delivary mans review
+    app.get("/reviews/delivaryman/:id", async (req, res) => {
+      const delivaryManId = req.params.id;
+      // console.log("delivary man in in review = ", delivaryManId);
+      const query = {
+        delivartManId: delivaryManId,
+      };
+
+      const reviewResponse = await reviewsCollection.find(query).toArray();
+
+      console.log("data in review = ", reviewResponse);
+      res.send(reviewResponse);
+    });
+
     //! review related api ends
 
     //!-------------------------------------------------------------------------------
