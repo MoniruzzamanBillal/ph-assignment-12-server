@@ -321,9 +321,43 @@ async function run() {
         option
       );
 
-      console.log("response from  increase delivary = ", response);
+      // console.log("response from  increase delivary = ", response);
 
       res.send(response);
+    });
+
+    //* parcel booked number  related data add api
+    app.patch("/user/parcelbooknum/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const parcelData = await parcelsCollection.findOne(query);
+      const userEmail = parcelData?.userEmail;
+
+      const userData = await usersCollection.findOne({ email: userEmail });
+
+      console.log("specific user data  = ", userData);
+      let update = {};
+      const option = { upsert: true };
+      if (userData && userData.parcelBook !== undefined) {
+        update = {
+          $inc: {
+            parcelBook: 1,
+          },
+        };
+      } else {
+        update = {
+          $set: {
+            parcelBook: 1,
+          },
+        };
+      }
+      const result = await usersCollection.findOneAndUpdate(
+        { email: userEmail },
+        update,
+        option
+      );
+
+      res.send(result);
     });
 
     // get delivary man related api based on review and delivary done
