@@ -262,11 +262,6 @@ async function run() {
         };
       }
 
-      // const update = {
-      //   $inc: { delivaryDone: 1 },
-      //   $setOnInsert: { delivaryDone: 1 },
-      // };
-
       const response = await usersCollection.findOneAndUpdate(
         query,
         update,
@@ -407,6 +402,41 @@ async function run() {
       } catch (error) {
         console.log(error);
       }
+    });
+
+    // average rating api
+    app.patch("/averagerating/rating/:id", async (req, res) => {
+      const delivaryManId = req.params.id;
+      const query = {
+        delivartManId: delivaryManId,
+      };
+      const reviewData = await reviewsCollection.find(query).toArray();
+
+      const rating = reviewData.map((data) => parseFloat(data?.rating));
+      const sumOfRating = rating.reduce((total, rating) => total + rating, 0);
+      const totalData = reviewData.length;
+      const averageRating = (sumOfRating / totalData).toFixed(2);
+
+      // console.log("data in average rating = ", reviewData.length);
+      console.log("data in average rating = ", averageRating);
+
+      const queryId = { _id: new ObjectId(delivaryManId) };
+      const option = { upsert: true };
+      const update = {
+        $set: {
+          averageRating,
+        },
+      };
+
+      const updateResponse = await usersCollection.updateOne(
+        queryId,
+        update,
+        option
+      );
+
+      res.send(updateResponse);
+
+      //
     });
 
     // get specific delivary mans review
