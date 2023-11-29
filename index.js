@@ -101,35 +101,6 @@ async function run() {
       });
     };
 
-    const verifyToken2 = (req, res, next) => {
-      const token = req?.headers?.cookie;
-
-      console.log("--------------------------");
-      console.log("token in middlewire ", token);
-      console.log("--------------------------");
-
-      jwt.verify(token, process.env.TOKEN_SECRET, (error, decoded) => {
-        console.log("--------------------------");
-        console.log("inside verify ");
-        console.log("--------------------------");
-
-        console.log("--------------------------");
-        console.log("decoded = ", decoded);
-        console.log("error in verify = ", error);
-        console.log("--------------------------");
-        if (error) {
-          return res.status(401).status({ message: "forbidden access" });
-        }
-
-        console.log("--------------------------");
-        console.log("after error ");
-        console.log("--------------------------");
-
-        req.decoded = decoded;
-        console.log("hit next");
-        next();
-      });
-    };
     // ! making  middlewire ends
 
     //*-------------------------------------------------------------------------------
