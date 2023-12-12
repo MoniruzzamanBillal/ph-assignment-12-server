@@ -350,6 +350,24 @@ async function run() {
 
     // ! parcels realted api
 
+    app.get("/reviniew", async (req, res) => {
+      const query = {
+        status: "delivered",
+      };
+
+      const data = await parcelsCollection.find(query).toArray();
+
+      let sum = 0;
+
+      const calculate = data.map((ele) => {
+        sum += ele.parcelCharge;
+      });
+
+      // console.log(sum);
+
+      res.send({ reviniew: sum });
+    });
+
     // delivered count
     app.get("/delivered/count", async (req, res) => {
       const query = {
